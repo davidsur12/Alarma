@@ -1,9 +1,6 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
-
 
 /*
 con
@@ -12,7 +9,7 @@ cliente: mqttx_160c815e
 puerto: 8083
 path: /mqtt
 */
-class MqttCliente extends ChangeNotifier{
+class MqttCliente {
 
 //final client = MqttServerClient('broker.emqx.io', '');
 late  MqttServerClient cliente;
@@ -20,27 +17,46 @@ var pongCount = 0;
 String _url="127.0.0.1";
 int _puerto=1883;
 String _idAlarma="mqttx_160c815ee";
-String _topico="";
+String _topico="casa";
 
 
-Future<Object> connectBroker() async{
+Future<int> connectBroker() async{
 
-cliente=MqttServerClient.withPort(_url, _idAlarma, _puerto);//parametros de coneccion con el brokker
-cliente.logging(on: true);// configuro el loggeo
-cliente.setProtocolV311();// configuro la version del protocolo
 
 try{
+
+    //final  cliente = MqttBrowserClient("127.0.0.1", "mqttx_160c815");
+    print("cliente log");
+    cliente=MqttServerClient.withPort("127.0.0.1", "mqttx_160c815", 1883);
+
+}catch(e){print("error $e");}
+//cliente=MqttServerClient.withPort("127.0.0.1", "mqttx_160c815", 1883);//parametros de coneccion con el brokker
+/*cliente.logging(on: true);// configuro el loggeo
+cliente.setProtocolV311();// configuro la version del protocolo
+
+    cliente.keepAlivePeriod = 60;
+    cliente.onConnected = onConnected;
+    cliente.onDisconnected = onDisconnected;
+    cliente.onSubscribed = onSubscribed;
+    cliente.pongCallback = pong;
+*/
+print("mqtt iniciando");
+/*
+try{
   //me conecto al broker
-await cliente.connect();
+await cliente.connect().catchError((v){print(v.toString());});
 print("conectado");
-}catch(e){
-  //error no se conecto al broker
-  print("______________________Error___________");
-  print("error $e");
-  cliente.disconnect();
-  
-}
+}on NoConnectionException catch (e) {
+      print('MQTTClient::Client exception - $e');
+      cliente.disconnect();
+    } on SocketException catch (e) {
+      print('MQTTClient::Socket exception - $e');
+      cliente.disconnect();
+    }
+    */
 return 0;
+
+ 
 
 }
 enviarInfo(var info ){
@@ -88,7 +104,29 @@ suscribctor(){
     });
 }
 
+void disconnect(){
+    cliente.disconnect();
+  }
 
+  void subscribe(String topic) {
+    cliente.subscribe(topic, MqttQos.atLeastOnce);
+  }
+
+  void onConnected() {
+    print('MQTTClient::Connected');
+  }
+
+  void onDisconnected() {
+    print('MQTTClient::Disconnected');
+  }
+
+  void onSubscribed(String topic) {
+    print('MQTTClient::Subscribed to topic: $topic');
+  }
+
+  void pong() {
+    print('MQTTClient::Ping response received');
+  }
 }
 
 /*

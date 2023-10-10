@@ -1,4 +1,5 @@
 import 'package:alarma/mqtt/cliente.dart';
+//import 'package:alarma/mqtt/mqtt_web.dart';
 import 'package:flutter/material.dart';
 
 class home extends StatefulWidget {
@@ -14,6 +15,13 @@ opciones o btones estaran en una lista que contendra otra lista que  contendra t
 
 class _homeState extends State<home> {
   double espcaio = 15.0;
+var mttCliente = MqttCliente();
+  @override
+  void initState() {
+    // TODO: implement initState
+    
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(child: Column(children: [
@@ -127,7 +135,9 @@ class _homeState extends State<home> {
       children: [
         ElevatedButton(
           onPressed: () {
-          MqttCliente().connectBroker();
+      
+setupMqttClient();
+
 
           },
           child: Column(
@@ -191,36 +201,8 @@ class _homeState extends State<home> {
     ));
   }
 
-  Widget alarmaGenerica2(String img, String txt) {
-    //sin uso
-    return ElevatedButton(
-        onPressed: () {},
-        child: Container(
-          //card principal
-          color: Colors.green,
-          height: 140,
-          width: MediaQuery.of(context).size.width / 2.5,
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-             Center(child:  Image.asset(img, width: 70),),
-              Container(
-                height: 30,
-                color: Colors.white,)
-            ],
-          ),
-        ),
-         style: ButtonStyle(
-            // shape: MaterialStateProperty.all(CircleBorder()),
-            padding: MaterialStateProperty.all(EdgeInsets.all(20)),
-            backgroundColor: MaterialStateProperty.all(
-                Color.fromARGB(255, 8, 27, 61)), // <-- Button color
-            overlayColor: MaterialStateProperty.resolveWith<Color?>((states) {
-              if (states.contains(MaterialState.pressed))
-                return Colors.red; // <-- Splash color
-            }),
-          ));
-  
-  
+Future<void> setupMqttClient() async {
+       await  mttCliente.connectBroker();
+   // mqttClientManager.subscribe(pubTopic);
   }
 }
