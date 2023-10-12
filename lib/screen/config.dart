@@ -50,11 +50,14 @@ class _ConfigState extends State<Config> {
           ],),
           ElevatedButton(onPressed: (){
 
-
-            widget.cliente.host=host.text;
+if(host.text != null  &&  host.text.toString().length>0 && puerto.text != null  &&  puerto.text.toString().length>0 ){
+widget.cliente.host=host.text;
             widget.cliente.puerto=int.parse(puerto.text);
             print("hosttttt   "  + widget.cliente.host);
             print("puertooooooo     "   +   widget.cliente.puerto.toString());
+
+}
+            
             
             
             widget.cliente.connectBroker();

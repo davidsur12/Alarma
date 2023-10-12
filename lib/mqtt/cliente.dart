@@ -15,8 +15,8 @@ class MqttCliente {
 //final client = MqttServerClient('broker.emqx.io', '');
 
 var pongCount = 0;
-StreamController<int> streamc= StreamController();
-
+late StreamController<int> streamc = new StreamController();//= StreamController.broadcast();
+  late StreamController<String> subdscritorController; // 
 //broker
  //String host="broker.emqx.io";
   String host="140.238.178.88";
@@ -25,7 +25,7 @@ String idAlarma="mqttx_160c815eegh";
 String _topico="prueba";
 late MqttServerClient cliente; //= MqttServerClient.withPort(host, _idAlarma, _puerto);
   var strController = StreamController<int>();
-  var subdscritorController = StreamController<String>();
+
 int con=0;
 
 Future<int> connectBroker() async{
@@ -64,9 +64,10 @@ print('EXAMPLE::Mosquitto client connecting....');
 cliente.connectionMessage = connMess;
 */
 try{
+  
   //me conecto al broker
   await  cliente.connect().then((value) => print("conectadooooooooooooooo"));
-
+subdscritorController = StreamController<String>();
 print("conectado");
 }on NoConnectionException catch (e) {
       print('MQTTClient::Client exception - $e');
@@ -196,6 +197,8 @@ void disconnect(){
     print('MQTTClient::Disconnected');
     if (cliente != null && cliente.connectionStatus?.state== MqttConnectionState.connected) {
       cliente.disconnect();
+       streamc.close();
+       subdscritorController.close;
       print('Cliente MQTT desconectado.');
     }
     streamc.add(0);

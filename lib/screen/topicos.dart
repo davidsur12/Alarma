@@ -66,7 +66,7 @@ topico(),
 
   }, child: Container(
     width:MediaQuery.of(context).size.width/2,
-    child: Center(child:Text("Desconectar"),),)),
+    child: Center(child:Text("Desconectar de broker"),),)),
 ],);
 
 
@@ -125,7 +125,7 @@ topico(),
         }, child: Container(
 
           width:MediaQuery.of(context).size.width/2,
-    child: Center(child: Text("Suscribirse al topico"),),))
+    child: Center(child: Text("Suscribirse al un topico "),),))
 
     ],);
 
