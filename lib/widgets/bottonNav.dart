@@ -1,7 +1,9 @@
+import 'package:alarma/screen/test_broker.dart';
 import 'package:flutter/material.dart';
 import "package:persistent_bottom_nav_bar/persistent_tab_view.dart";
 import 'package:alarma/screen/home.dart';
 import 'package:alarma/screen/store.dart';
+import 'package:alarma/screen/config.dart';
 class ButtonNav extends StatefulWidget {
   const ButtonNav({super.key});
 
@@ -15,7 +17,7 @@ class _ButtonNavState extends State<ButtonNav> {
         return [
           Store(),
            home(),
-          Screen2(),
+          TextCliente(),
          
 
         ];

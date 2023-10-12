@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
@@ -12,78 +13,136 @@ path: /mqtt
 class MqttCliente {
 
 //final client = MqttServerClient('broker.emqx.io', '');
-late  MqttServerClient cliente;
-var pongCount = 0;
-String _url="127.0.0.1";
-int _puerto=1883;
-String _idAlarma="mqttx_160c815ee";
-String _topico="casa";
 
+var pongCount = 0;
+StreamController<int> streamc= StreamController();
+
+//broker
+ String _host="broker.emqx.io";
+int _puerto=1883;//puerto tcp
+String _idAlarma="mqttx_160c815ee";
+String _topico="prueba";
+late MqttServerClient cliente; //= MqttServerClient.withPort(host, _idAlarma, _puerto);
+  var strController = StreamController<int>();
+int con=0;
 
 Future<int> connectBroker() async{
 
 
 try{
 
-    //final  cliente = MqttBrowserClient("127.0.0.1", "mqttx_160c815");
-    print("cliente log");
-    cliente=MqttServerClient.withPort("127.0.0.1", "mqttx_160c815", 1883);
+    //configuro el cliente
+    cliente=MqttServerClient.withPort(_host, _idAlarma, _puerto);
+    //cliente=MqttServerClient.withPort("127.0.0.1", "mqttx_160c815", 1883);//parametros de coneccion con el brokker
+    cliente.logging(on: true);// configuro el loggeo
+    cliente.setProtocolV311();// configuro la version del protocolo
 
-}catch(e){print("error $e");}
-//cliente=MqttServerClient.withPort("127.0.0.1", "mqttx_160c815", 1883);//parametros de coneccion con el brokker
-/*cliente.logging(on: true);// configuro el loggeo
-cliente.setProtocolV311();// configuro la version del protocolo
-
-    cliente.keepAlivePeriod = 60;
+    cliente.keepAlivePeriod = 10; 
+    
     cliente.onConnected = onConnected;
     cliente.onDisconnected = onDisconnected;
     cliente.onSubscribed = onSubscribed;
     cliente.pongCallback = pong;
-*/
-print("mqtt iniciando");
-/*
+
+
+}catch(e){print("error  en configuracion $e");
+return 0;
+}
+
+
+final connMess = MqttConnectMessage()
+    .withClientIdentifier('Mqtt_MyClientUniqueId')
+    .withWillTopic('prueba') // If you set this you must set a will message
+    .withWillMessage('My Will message')
+    .startClean() // Non persistent session for testing
+    .withWillQos(MqttQos.atLeastOnce);
+print('EXAMPLE::Mosquitto client connecting....');
+cliente.connectionMessage = connMess;
+
 try{
   //me conecto al broker
-await cliente.connect().catchError((v){print(v.toString());});
+  await  cliente.connect().then((value) => print("conectadooooooooooooooo"));
+
 print("conectado");
 }on NoConnectionException catch (e) {
       print('MQTTClient::Client exception - $e');
       cliente.disconnect();
+      return 0;
     } on SocketException catch (e) {
       print('MQTTClient::Socket exception - $e');
       cliente.disconnect();
+      return 0;
     }
-    */
-return 0;
+
+if(cliente.connectionStatus?.state == MqttConnectionState.connected ){
+
+  print("--------------------------------Cliente conectado");
+  streamc.add(1);
+  //enviarInfo("tem:15");
+  //suscribctor();
+//return 1;
+strController.add(1);
+return 1;
+}else{
+  print("------------------------------Cilente no conectado");
+ // return 0;
+  strController.add(0);
+  return 0;
+}
+
+//return 0;
 
  
 
 }
-enviarInfo(var info ){
+
+Stream<bool> EstadoConection()async*{
+
 
 if(cliente.connectionStatus?.state == MqttConnectionState.connected ){
 
-print("--------------------------Conectado----------------------");
-//publicarMessage("casa", "{tem:17}");
+  print("--------------------------------Cliente conectado");
+  //enviarInfo("tem:15");
+  //suscribctor();
+//return 1;
+//strController.add(1);
+yield true;
+//return true;
+}else{
+  print("------------------------------Cilente no conectado");
+ // return 0;
+  //strController.add(0);
+  //return false;
+  yield false;
+}
+
+
+
+
+}
+
+enviarInfo(var topico,var info ){
+
+if(cliente.connectionStatus?.state == MqttConnectionState.connected ){
 
 final builder = MqttClientPayloadBuilder();//preparo el mensaje
 builder.addString(info.toString());
   
- if (cliente.connectionStatus?.state == MqttConnectionState.connected) {
+
   
   //verifico si el cliente esta conectado con el broker
-cliente.publishMessage(_topico, MqttQos.atMostOnce, builder.payload!);
+cliente.publishMessage(topico, MqttQos.atMostOnce, builder.payload!);
 
 print("--------------------------mensaje enviado-------------------");
   
     
-  }
+  
 
 }
 else{
-print("**************** No conectado *******************");
+print("**************** Broker no conectado *******************");
 cliente.disconnect();
-exit(-1);
+//exit(-1);
 
 }
 }
@@ -99,7 +158,7 @@ suscribctor(){
 
       //data.value = pt;
       print(
-          'MQTT_LOGS:: New data arrived: topic is <${c[0].topic}>, payload is $pt');
+          'date------------- <${c[0].topic}>, payload is $pt');
       print('');
     });
 }
@@ -112,20 +171,25 @@ void disconnect(){
     cliente.subscribe(topic, MqttQos.atLeastOnce);
   }
 
-  void onConnected() {
+  Stream<bool> onConnected() async*{
     print('MQTTClient::Connected');
+    yield true;
+    streamc.add(1);
   }
 
   void onDisconnected() {
     print('MQTTClient::Disconnected');
+    streamc.add(0);
   }
 
   void onSubscribed(String topic) {
     print('MQTTClient::Subscribed to topic: $topic');
   }
 
-  void pong() {
+  Stream<int> pong() async*{
     print('MQTTClient::Ping response received');
+print("cont $con");
+    yield con++;
   }
 }
 
