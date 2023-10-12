@@ -4,7 +4,7 @@ import 'package:alarma/mqtt/cliente.dart';
 class Config extends StatefulWidget {
   
    final  MqttCliente cliente;
-  const Config( this.cliente);
+   const Config( this.cliente);
 
   @override
   State<Config> createState() => _ConfigState();
@@ -49,6 +49,14 @@ class _ConfigState extends State<Config> {
 
           ],),
           ElevatedButton(onPressed: (){
+
+
+            widget.cliente.host=host.text;
+            widget.cliente.puerto=int.parse(puerto.text);
+            print("hosttttt   "  + widget.cliente.host);
+            print("puertooooooo     "   +   widget.cliente.puerto.toString());
+            
+            
             widget.cliente.connectBroker();
           }, child: Text("Conectar"))
 

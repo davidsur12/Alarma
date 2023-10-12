@@ -38,6 +38,8 @@ dependencies:
   mqtt_client: ^10.0.0
   persistent_bottom_nav_bar: ^5.0.2
   carousel_slider: ^4.2.1
+  fluttertoast: ^8.2.2
+  text_area: ^0.0.3
 
 dev_dependencies:
   flutter_test:
